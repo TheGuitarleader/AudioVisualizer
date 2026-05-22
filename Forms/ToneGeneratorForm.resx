@@ -117,38 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="loopTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
-  <metadata name="toolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>126, 17</value>
-  </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="addTsBtn.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADMSURBVDhPvZPZDQIxDESnFEqhFDqhFEqhFEoBvdU+tOsc
-        CxJiJH/Ex3jsJMmfcEpyTXJJcq7BT0Dxs2OPNXYIFNzXIgpUgR9VNoAQ3xCQkDQbAwJysC7sVknw34qP
-        HFU3IFALACqxCnIbVXZgDxUjImt2E0CA0wUiWQKX61nV5DbNZZeIZAshIeZ5u5eGSPa6aDAarU6xQKJv
-        l01Ng9H1U1CveXr9vuqjBylJT+UbvlrHZA/4MAi2X2TWbIE/noKedceZQSV+1kMFP8ELUiFRR8fLx0kA
-        AAAASUVORK5CYII=
-</value>
-  </data>
-  <data name="removeTsBtn.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAB8SURBVDhPY2CgA6jHghPQFREC8xkYGP7jwCA5osF+KEYH
-        uMThwAHNC/ehGN1r2MRBeuEAJIDuBWIxSC8GwCmBBmAW4wTIBilA2SAamQ0CJBkE8juID6KR2SAwahAE
-        UM0gqsUaPkDQIFA+AikgBuPNcyCng4oKkI2EMG0AAPsxYisaJ88xAAAAAElFTkSuQmCC
-</value>
-  </data>
-  <data name="toneGenTsBtn.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACPSURBVDhP5ZLRCcMwDAVvlIzSUbpJRskoHaWjNBzkQTBq
-        UNKvkgNjJFvSs2S4DU9gAT7AC3iMFzpMW4I3MG+79ulkKjA4mFhbf5uoUckebf2et1B+9Yz47V2LVK7w
-        eQ6goq1UMsWRtKOt1otVn5JobMch1SC+FTjEPrn2QfGdwur5Uz99VjEoKhzApSR/yArhUSh3eRjXYgAA
-        AABJRU5ErkJggg==
-</value>
-  </data>
 </root>

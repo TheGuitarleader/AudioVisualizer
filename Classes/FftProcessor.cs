@@ -21,16 +21,21 @@ namespace AudioVisualizer.Classes
 
         public FftResult Process(byte[] buffer)
         {
-            double[] samples = ExtractSamples(buffer);
+            int sampleCount = Math.Min(buffer.Length / 2, FftSize);
+
+            double[] samples = new double[sampleCount];
+
+            for (int i = 0; i < sampleCount; i++)
+            {
+                short sample = BitConverter.ToInt16(buffer, i * 2);
+                samples[i] = sample / 32768.0;
+            }
 
             Complex[] fftBuffer = CreateFFTBuffer(samples);
-
             RunFFT(fftBuffer);
 
             double[] magnitudes = ComputeMagnitudes(fftBuffer);
-
             double[] smoothed = SmoothMagnitudes(magnitudes);
-
             double[] frequencies = BuildFrequencyAxis();
 
             return new FftResult
@@ -87,7 +92,7 @@ namespace AudioVisualizer.Classes
             for (int i = 0; i < length; i++)
             {
                 double mag = Math.Sqrt(fftBuffer[i].X * fftBuffer[i].X + fftBuffer[i].Y * fftBuffer[i].Y);
-                double db = 20 * Math.Log10(mag);
+                double db = 20 * Math.Log10(mag + 1e-10);
 
                 if (db < -100) db = -100;
                 magnitudes[i] = db;

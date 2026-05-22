@@ -8,8 +8,11 @@ namespace AudioVisualizer.Classes
 {
     internal class FftResult
     {
-        public double[] Samples { get; set; }
-        public double[] Frequencies { get; set; }
-        public double[] Magnitudes { get; set; }
+        public long TimeStamp { get; } = Environment.TickCount64;
+        public double[] Samples { get; set; } = [];
+        public double[] Frequencies { get; set; } = [];
+        public double[] Magnitudes { get; set; } = [];
+
+        public static FftResult Null = new();
     }
 }

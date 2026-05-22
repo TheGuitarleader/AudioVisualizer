@@ -1,6 +1,9 @@
 using AudioVisualizer.Classes;
+using AudioVisualizer.Forms;
+using EntexSharp.Diagnostics;
 using NAudio.CoreAudioApi;
 using NAudio.Dsp;
+using NAudio.MediaFoundation;
 using NAudio.Wave;
 using ScottPlot;
 using ScottPlot.Plottables;
@@ -9,21 +12,30 @@ namespace AudioVisualizer
 {
     public partial class MainForm : Form
     {
-        private WasapiLoopbackCapture _wasapi;
+        private readonly List<InputChannel> _channels = new List<InputChannel>();
+
+        private AudioFileReader _reader;
         private WaveInEvent? _waveIn;
-        private FftProcessor _processor;
+        private WaveOutEvent? _waveOut;
 
-        private FftResult _inResult;
-        private FftResult _outResult;
+        private FftProcessor _waveInFft;
+        private FftProcessor _waveOutFft;
 
-        private Signal? _levelSignal;
+        private FftResult? _waveInResult = new();
+        private FftResult? _waveOutResult = new();
+
+        private SignalXY? _levelSignal;
+        private SignalXY? _frequencySignal;
 
         public MainForm()
         {
             InitializeComponent();
             MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
             MMDevice device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-            _wasapi = new WasapiLoopbackCapture(device);
+
+            _levelSignal = frequencyPlot.Plot.Add.SignalXY(new double[] { 0 }, new double[] { 0 }, Colors.Red);
+            _frequencySignal = frequencyPlot.Plot.Add.SignalXY(new double[] { 0 }, new double[] { 0 }, Colors.Blue);
+            frequencyPlot.Plot.ShowLegend();
 
             levelsPlot.Plot.YLabel("Level");
             levelsPlot.Plot.XLabel("Time (milliseconds)");
@@ -39,58 +51,78 @@ namespace AudioVisualizer
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            for (int i = 0; i < NAudio.Wave.WaveIn.DeviceCount; i++)
+            for (int i = 0; i < WaveIn.DeviceCount; i++)
             {
-                var caps = NAudio.Wave.WaveIn.GetCapabilities(i);
-                audioDeviceCB.Items.Add(caps.ProductName);
+                var caps = WaveIn.GetCapabilities(i);
+                audioDeviceTsCB.Items.Add(caps.ProductName);
             }
 
-            audioDeviceCB.SelectedIndex = 0;
+            audioDeviceTsCB.SelectedIndex = 0;
+            loopTimer.Start();
         }
 
-        private void audioDeviceCB_SelectedIndexChanged(object sender, EventArgs e)
+        private void addTsBtn_Click(object sender, EventArgs e)
         {
-            if (_waveIn is not null)
-            {
-                _waveIn.StopRecording();
-                _waveIn.Dispose();
-            }
+            if (audioDeviceTsCB.SelectedIndex == -1) return;
+            FftProcessor processor = new FftProcessor(48000);
 
-            if (audioDeviceCB.SelectedIndex == -1) return;
-
-            _waveIn = new WaveInEvent()
+            WaveInEvent waveIn = new WaveInEvent
             {
-                DeviceNumber = audioDeviceCB.SelectedIndex,
+                DeviceNumber = audioDeviceTsCB.SelectedIndex,
                 WaveFormat = new WaveFormat(48000, 16, 1),
                 BufferMilliseconds = 20
             };
 
-            _processor = new FftProcessor(_waveIn.WaveFormat.SampleRate);
-            _waveIn.DataAvailable += WaveIn_DataAvailable;
-            _waveIn.StartRecording();
+            InputChannel channel = new InputChannel
+            {
+                DeviceIndex = audioDeviceTsCB.SelectedIndex,
+                Processor = processor,
+                WaveIn = waveIn
+            };
+
+            waveIn.DataAvailable += (s, e) =>
+            {
+                channel.Result = processor.Process(e.Buffer);
+            };
+
+            waveIn.StartRecording();
+            _channels.Add(channel);
         }
 
-        private void WaveIn_DataAvailable(object? sender, WaveInEventArgs e)
+        private void removeTsBtn_Click(object sender, EventArgs e)
         {
-            FftResult result = _processor.Process(e.Buffer);
+            if (audioDeviceTsCB.SelectedIndex == -1) return;
 
-            // --- TIME DOMAIN PLOT ---
-            levelsPlot.Invoke((MethodInvoker)delegate
-            {
-                levelsPlot.Plot.Clear();
-                levelsPlot.Plot.Add.Signal(result.Samples, 1, Colors.Red).LineWidth = 2;
-                levelsPlot.Plot.RenderInMemory();
-                levelsPlot.Refresh();
-            });
+            InputChannel? channel = _channels.FirstOrDefault(c => c.DeviceIndex == audioDeviceTsCB.SelectedIndex);
+            if (channel == null) return;
 
-            // --- FREQUENCY DOMAIN PLOT ---
-            frequencyPlot.Invoke((MethodInvoker)delegate
+            channel.WaveIn.StopRecording();
+            channel.WaveIn.Dispose();
+
+            _channels.Remove(channel);
+        }
+
+        private void toneGenTsBtn_Click(object sender, EventArgs e)
+        {
+            ToneGeneratorForm toneGeneratorForm = new ToneGeneratorForm();
+            toneGeneratorForm.Show();
+        }
+
+        private void loopTimer_Tick(object sender, EventArgs e)
+        {
+            levelsPlot.Plot.Clear();
+            frequencyPlot.Plot.Clear();
+
+            foreach (var input in _channels)
             {
-                frequencyPlot.Plot.Clear();
-                frequencyPlot.Plot.Add.SignalXY(result.Frequencies, result.Magnitudes, Colors.Red).LineWidth = 2;
-                frequencyPlot.Plot.RenderInMemory();
-                frequencyPlot.Refresh();
-            });
+                if (input.Result == null) continue;
+
+                levelsPlot.Plot.Add.Signal(input.Result.Samples).LineWidth = 2;
+                frequencyPlot.Plot.Add.SignalXY(input.Result.Frequencies, input.Result.Magnitudes).LineWidth = 2;
+            }
+
+            frequencyPlot.Refresh();
+            levelsPlot.Refresh();
         }
     }
 }
